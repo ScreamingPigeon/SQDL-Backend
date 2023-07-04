@@ -1,7 +1,10 @@
 import express from "express";
-import { userLogin,userSignup,updateInfo,getAlluser, get, getByID } from "../../controller/user-controller.js";
+import { userLogin,userSignup,updateInfo,getAlluser, get, getByID, deleteUser } from "../../controller/user-controller.js";
 import inviteTeacher from "../../invite/sendInvite.js"
 import acceptInvite from "../../invite/acceptInvite.js"
+
+import { createSubject, getAllSubject, getSubjectByID } from "../../controller/subject-controller.js";
+import { createModule, getAllFromSubjectId, getById } from "../../controller/module-controller.js";
 
 const router = express.Router();
 
@@ -9,7 +12,7 @@ const router = express.Router();
 router.post('/user/signup', userSignup);
 //LOGIN Route
 router.post('/user/login', userLogin);  //user login
-
+router.post('/user/delete', deleteUser);//delete user
 //Data Update ROUTES
 router.post('/user/update', updateInfo) // update information
 
@@ -23,5 +26,27 @@ router.post('/user/getID', getByID);
 router.post('/user/signup', userSignup); //student sign up
 router.post('/admin/invite', inviteTeacher); //send invite to a teacher
 router.post('/teacher/accept', acceptInvite); //send invite to a teacher
+
+//Subject routes
+
+router.post('/subject/create', createSubject);
+router.get('/subject/getAll', getAllSubject)
+router.post('/subject/getID', getSubjectByID)
+
+//Module routes
+router.post('/module/create', createModule);
+router.post('/module/getAllFromSubjectID', getAllFromSubjectId)
+router.post('/module/getID', getById)
+
+
+
+router.post('/subject/add', addUserSubject);
+
+
+//session routes
+
+router.post('/session/create', createSession);
+router.get('/session/get', getSession);
+router.get('/session/getAll', getAllSession)
 
 export default router

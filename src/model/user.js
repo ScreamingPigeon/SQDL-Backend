@@ -2,11 +2,15 @@ import mongoose from "mongoose";
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import { Jwt_key } from "../config/serverConfig.js";
+import subjectSchema from './subject.js'
 
 const userSchema = new mongoose.Schema({
     email:{
         type: String,
         required: true,
+        unique: true
+    }, studentId: {
+        type: String,
         unique: true
     },
     name:{
@@ -32,9 +36,43 @@ const userSchema = new mongoose.Schema({
     },
     type: { //ADDED
         type: String,
-        enum: ['student', 'teacher', 'admin']
-    }
+        enum: ['student', 'teacher', 'admin'],
+        default: 'student'
+    },
+    subjects: {
+        type: [{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Subject',
+        }],
+        default: [],
+      },
+
 }, {timestamps: true})
+
+
+userSchema.pre('save', async function(next) {
+   
+        if (!this.studentId) {
+            // Generate the student ID if it doesn't exist
+            this.studentId = await generateUniqueStudentId();
+        }
+    next();
+});
+
+async function generateUniqueStudentId() {
+    let studentId;
+    do {
+        // Generate a potential student ID
+        studentId = 'S' + Math.random().toString().substring(2, 9);
+        // Check if the student ID already exists
+        const count = await mongoose.model('User').countDocuments({ studentId });
+        if (count === 0) {
+            // Unique student ID generated
+            return studentId;
+        }
+    } while (true);
+}
+
 
 userSchema.pre('save', function(next){
     const student = this;
